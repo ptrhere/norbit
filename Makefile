@@ -2,11 +2,11 @@ CC = gcc
 CXX = g++
 LD = g++
 CFLAGS = `sdl-config --cflags` -g  
-LDFLAGS = `sdl-config --libs` -lSDL_image -lGL -lGLU
+LDFLAGS = `sdl-config --libs` -lSDL_image -lGL -lGLU -lzmq
 RM   = /bin/rm -f
-OBJS = main.o object.o extra.o shadow.o game_object.o physics.o obj_shape.o control.o sphere_shape.o
+OBJS = object.o extra.o shadow.o game_object.o physics.o obj_shape.o control.o sphere_shape.o
 
-all: norbit test_obj
+all: norbit-server norbit-client test_obj 
 
 %.o : %.cpp
 	$(CXX) $< -o $@ -c -MMD -MF $(basename $@).dep 
@@ -18,8 +18,10 @@ all: norbit test_obj
 
 .PHONY: clean
 
-norbit: $(OBJS)
-	$(LD) $(LDFLAGS) -o norbit $(OBJS)
+norbit-client: $(OBJS) norbit-client.o
+	$(LD) $(LDFLAGS) -o norbit-client $(OBJS) norbit-client.o
+norbit-server: $(OBJS) norbit-server.o
+	$(LD) $(LDFLAGS) -o norbit-server $(OBJS) norbit-server.o
 test_obj: test_obj.o object.o physics.o
 	$(LD) $(LDFLAGS) -o test_obj test_obj.o object.o
 test_physics : test_physics.o physics.o
